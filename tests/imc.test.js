@@ -1,19 +1,17 @@
+import { test, equal } from 'node:test';
+import assert from 'node:assert/strict';
 import request from 'supertest';
 import app from '../src/app.js';
 
-describe('Cálculo de IMC', () => {
-  it('calcula IMC y categoría', async () => {
-    const res = await request(app)
-      .post('/imc')
-      .send({ peso: 70, altura: 1.75 });
+test('calcula IMC y categoría', async () => {
+  const res = await request(app).post('/imc').send({ peso: 70, altura: 1.75 });
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body.imc).toBeCloseTo(22.86, 1);
-    expect(res.body.categoria).toBe('Normal');
-  });
+  assert.equal(res.statusCode, 200);
+  assert.ok(Math.abs(res.body.imc - 22.86) < 0.1);
+  assert.equal(res.body.categoria, 'Normal');
+});
 
-  it('valida entrada incompleta', async () => {
-    const res = await request(app).post('/imc').send({ peso: 70 });
-    expect(res.statusCode).toBe(400);
-  });
+test('valida entrada incompleta', async () => {
+  const res = await request(app).post('/imc').send({ peso: 70 });
+  assert.equal(res.statusCode, 400);
 });
